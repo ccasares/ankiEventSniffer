@@ -313,7 +313,7 @@ def dumpPackets():
                         # Check if we are in the two first tracks.
                         if (new_known_position == first_track_1) or (new_known_position == first_track_2):
                             # CHECK IF WE LOSE THE FINISH LINE Event
-                            if (new_known_position == first_track_2) and (last_known_position == first_track_1)
+                            if (new_known_position == first_track_2) and (last_known_position == first_track_1):
                                 wssend("TRACE TRANSITION TO TRACK 1 to TRACK 2.... Ignoring")
                             elif (last_known_position == final_track_1) or (last_known_position == final_track_2):
                                 # THERE WAS NOT FINISH LINE EVENT
