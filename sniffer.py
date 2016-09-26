@@ -39,6 +39,9 @@ final_track_2 = 0x0d
 first_track_1 = 0x00
 first_track_2 = 0x01
 
+last_known_position = 0x00
+new_known_position = 0x00
+
 race_status_file = "/home/pi/race_status.dat"
 race_count_file="/home/pi/race_count.dat"
 raceStatus = "UNKNOWN"
