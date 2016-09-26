@@ -310,6 +310,7 @@ def dumpPackets():
                         # Get the new position
                         new_known_position = packet.blePacket.payload[9]
                         wssend("FILTER TRANSITION UPDATE TO POSITION: %s" % new_known_position)
+                        wssend("COMMING FROM POSITION: %s" % last_known_position)
                         # Check if we are in the two first tracks.
                         if (new_known_position == first_track_1) or (new_known_position == first_track_2):
                             # CHECK IF WE LOSE THE FINISH LINE Event
