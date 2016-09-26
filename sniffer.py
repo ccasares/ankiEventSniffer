@@ -259,7 +259,7 @@ def dumpPackets():
                         #sys.stdout.flush()
                         if (trackId == 34): # Finish Segment
                           # Increase current lap
-                          currentLap = inc_lap_count(myDeviceAddress)
+                          currentLap = inc_lap_count(myCarName)
                           print "%s - Finish Line Crossed" % dateTimeString;
                           wssend("%s - Finish Line Crossed" % dateTimeString)
                           wssend("%s - Current Lap" % currentLap)
@@ -313,7 +313,7 @@ def dumpPackets():
                             if (last_known_position == final_track_1) or (last_known_position == final_track_2):
                                 # THERE WAS NOT FINISH LINE EVENT
                                 wssend("%s - FILTER Finish Line Event Missed" % dateTimeString)
-                                currentLap = inc_lap_count(myDeviceAddress)
+                                currentLap = inc_lap_count(myCarName)
                                 wssend("%s - FILTER Increasing Lap count to" % currentLap)
 
                                 timeNow = int(time.time()*1000)
