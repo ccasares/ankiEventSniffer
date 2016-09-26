@@ -274,7 +274,7 @@ def dumpPackets():
                               print "%s: LapTime: %d" % (myCarName, lapTime)
                               wssend("%s: LapTime: %d" % (myCarName, lapTime))
                               sys.stdout.flush()
-                              # trackSegment=0
+                              trackSegment=0
                               # SET last_known_position to FINISH LINE
                               last_known_position = "FL"
 
@@ -307,9 +307,9 @@ def dumpPackets():
                             # CHECK IF WE LOSE THE FINISH LINE Event
                             if (last_known_position == final_track_1) or (last_known_position == final_track_2):
                                 # THERE WAS NOT FINISH LINE EVENT
-                                wssend("%s - Finish Line Event Missed" % dateTimeString)
+                                wssend("%s - FILTER Finish Line Event Missed" % dateTimeString)
                                 currentLap = inc_lap_count(myDeviceAddress)
-                                wssend("%s - Increasing Lap count to" % currentLap)
+                                wssend("%s - FILTER Increasing Lap count to" % currentLap)
 
                                 timeNow = int(time.time()*1000)
                                 if(previousLapTime == 0):
@@ -322,14 +322,14 @@ def dumpPackets():
                                   # Send to IoT Cloud
                                   jsonData = {"deviceId":piId,"dateTime":timeNow*1000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"lap":currentLap,"lapTime":lapTime}
                                   #postRest(jsonData, "http://localhost:9999/sendMsgToIoT/urn:oracle:iot:device:data:anki:car:lap")
-                                  wssend("%s: LapTime: %d" % (myCarName, lapTime))
+                                  wssend("%s: FILTER LapTime: %d" % (myCarName, lapTime))
                                   trackSegment=0
                                   previousLapTime=timeNow
 
                                 else:
-                                  wssend("Lap too short... ignoring.")
+                                  wssend("FILTER Lap too short... ignoring.")
                             else:
-                                wssend("FINISH LINE EVENT DETECTED.... ignoring.")
+                                wssend("FILTER FINISH LINE EVENT DETECTED.... ignoring.")
 
                         # UPDATE CAR POSITION
                         last_known_position = new_known_position
