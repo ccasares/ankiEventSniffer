@@ -328,7 +328,7 @@ def dumpPackets():
 
                                 else:
                                   wssend("Lap too short... ignoring.")
-                            else
+                            else:
                                 wssend("FINISH LINE EVENT DETECTED.... ignoring.")
 
                         # UPDATE CAR POSITION
