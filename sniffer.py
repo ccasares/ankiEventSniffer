@@ -26,6 +26,19 @@ global raceStatus
 global raceCount
 global nodejs
 
+# Variable to control lap
+global final_track_1
+global final_track_2
+global first_track_1
+global first_track_2
+global last_known_position
+global new_known_position
+
+final_track_1 = "0x0e"
+final_track_2 = "0x0d"
+first_track_1 = "0x00"
+first_track_2 = "0x01"
+
 race_status_file = "/home/pi/race_status.dat"
 race_count_file="/home/pi/race_count.dat"
 raceStatus = "UNKNOWN"
@@ -190,7 +203,7 @@ def dumpPackets():
     global previousLapTime
     """Dumps incoming packets to the display"""
     # Get (pop) unprocessed BLE packets.
-    packets =mySniffer.getPackets() 
+    packets =mySniffer.getPackets()
     #print "dumpPackets() called. Packets dumped: %d" % len(packets)
     # Display the packets on the screen in verbose mode
     if args.verbose:
@@ -240,9 +253,11 @@ def dumpPackets():
                         #print "Track ID: %d" % trackId
                         #sys.stdout.flush()
                         if (trackId == 34): # Finish Segment
+                          # Increase current lap
                           currentLap = inc_lap_count(myDeviceAddress)
                           print "%s - Finish Line Crossed" % dateTimeString;
                           wssend("%s - Finish Line Crossed" % dateTimeString)
+                          wssend("%s - Current Lap" % currentLap)
                           sys.stdout.flush()
 
                           timeNow = int(time.time()*1000)
@@ -259,7 +274,10 @@ def dumpPackets():
                               print "%s: LapTime: %d" % (myCarName, lapTime)
                               wssend("%s: LapTime: %d" % (myCarName, lapTime))
                               sys.stdout.flush()
-                              trackSegment=0
+                              # trackSegment=0
+                              # SET last_known_position to FINISH LINE
+                              last_known_position = "FL"
+
                               print "Reset previous lap time."
                               wssend("Reset previous lap time.")
                               previousLapTime=timeNow
@@ -271,7 +289,7 @@ def dumpPackets():
                               #trackSegment=0
                               sys.stdout.flush()
 
-                            
+
                             #print "Reset previous lap time."
                             #previousLapTime=timeNow
 
@@ -280,10 +298,46 @@ def dumpPackets():
                         print "%s - TRANSITION UPDATE: " % dateTimeString
                         wssend("%s - TRANSITION UPDATE: " % dateTimeString)
 
+                        # VICTOR
+                        # Get the new position
+                        new_known_position = packet.blePacket.payload[9]
+
+                        # Check if we are in the two first tracks.
+                        if (new_known_position == first_track_1 or new_known_position == first_track_2)
+                            # CHECK IF WE LOSE THE FINISH LINE Event
+                            if (last_known_position == final_track_1 or last_known_position == final_track_2)
+                                # THERE WAS NOT FINISH LINE EVENT
+                                wssend("%s - Finish Line Event Missed" % dateTimeString)
+                                currentLap = inc_lap_count(myDeviceAddress)
+                                wssend("%s - Increasing Lap count to" % currentLap)
+
+                                timeNow = int(time.time()*1000)
+                                if(previousLapTime == 0):
+                                  previousLapTime=timeNow
+                                else:
+                                  lapTime = timeNow - previousLapTime
+
+                                # ADD CONTROL TO AVOID FAKE LAPS
+                                if(lapTime > 3000):
+                                  # Send to IoT Cloud
+                                  jsonData = {"deviceId":piId,"dateTime":timeNow*1000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"lap":currentLap,"lapTime":lapTime}
+                                  #postRest(jsonData, "http://localhost:9999/sendMsgToIoT/urn:oracle:iot:device:data:anki:car:lap")
+                                  wssend("%s: LapTime: %d" % (myCarName, lapTime))
+                                  trackSegment=0
+                                  previousLapTime=timeNow
+
+                                else:
+                                  wssend("Lap too short... ignoring.")
+                            else
+                                wssend("FINISH LINE EVENT DETECTED.... ignoring.")
+
+                        # UPDATE CAR POSITION
+                        last_known_position = new_known_position
+
                         #print " ".join(['0x%02x' % b for b in packetlist])
                         leftWheelDistance = packet.blePacket.payload[24]
                         rightWheelDistance = packet.blePacket.payload[25]
-                        
+
                         trackSegment=trackSegment+1
                         trackStyle=""
                         if leftWheelDistance == rightWheelDistance:
