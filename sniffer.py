@@ -341,6 +341,8 @@ def dumpPackets():
                                   wssend("FILTER Lap too short... ignoring.")
                             else:
                                 wssend("FILTER FINISH LINE EVENT DETECTED.... ignoring.")
+                                wssend("FILTER current track = %s " % new_known_position)
+                                wssend("FILTER last track = %s " % last_known_position)                                
 
                         # UPDATE CAR POSITION
                         last_known_position = new_known_position
