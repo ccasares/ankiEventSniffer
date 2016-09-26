@@ -34,10 +34,10 @@ global first_track_2
 global last_known_position
 global new_known_position
 
-final_track_1 = "0x0e"
-final_track_2 = "0x0d"
-first_track_1 = "0x00"
-first_track_2 = "0x01"
+final_track_1 = 0x0e
+final_track_2 = 0x0d
+first_track_1 = 0x00
+first_track_2 = 0x01
 
 race_status_file = "/home/pi/race_status.dat"
 race_count_file="/home/pi/race_count.dat"
@@ -301,7 +301,7 @@ def dumpPackets():
                         # VICTOR
                         # Get the new position
                         new_known_position = packet.blePacket.payload[9]
-
+                        wssend("%s - TRANSITION UPDATE TO POSITION: " % new_known_position)
                         # Check if we are in the two first tracks.
                         if (new_known_position == first_track_1) or (new_known_position == first_track_2):
                             # CHECK IF WE LOSE THE FINISH LINE Event
