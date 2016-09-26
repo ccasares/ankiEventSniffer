@@ -303,9 +303,9 @@ def dumpPackets():
                         new_known_position = packet.blePacket.payload[9]
 
                         # Check if we are in the two first tracks.
-                        if (new_known_position == first_track_1 or new_known_position == first_track_2)
+                        if (new_known_position == first_track_1) or (new_known_position == first_track_2)
                             # CHECK IF WE LOSE THE FINISH LINE Event
-                            if (last_known_position == final_track_1 or last_known_position == final_track_2)
+                            if (last_known_position == final_track_1) or (last_known_position == final_track_2)
                                 # THERE WAS NOT FINISH LINE EVENT
                                 wssend("%s - Finish Line Event Missed" % dateTimeString)
                                 currentLap = inc_lap_count(myDeviceAddress)
