@@ -265,7 +265,7 @@ def dumpPackets():
                           temp_current_lap = temp_current_lap + 1
                           print "%s - Finish Line Crossed" % dateTimeString;
                           wssend("%s - Finish Line Crossed" % dateTimeString)
-                          wssend("%s - Current Lap" % currentLap)
+                          wssend("%s - FILTER Current Lap" % temp_current_lap)
                           sys.stdout.flush()
 
                           timeNow = int(time.time()*1000)
@@ -309,18 +309,18 @@ def dumpPackets():
                         # VICTOR
                         # Get the new position
                         new_known_position = packet.blePacket.payload[9]
-                        wssend("TRACE TRANSITION UPDATE TO POSITION: %s" % new_known_position)
+                        wssend("FILTER TRANSITION UPDATE TO POSITION: %s" % new_known_position)
                         # Check if we are in the two first tracks.
                         if (new_known_position == first_track_1) or (new_known_position == first_track_2):
                             # CHECK IF WE LOSE THE FINISH LINE Event
                             if (new_known_position == first_track_2) and (last_known_position == first_track_1):
-                                wssend("TRACE TRANSITION TO TRACK 1 to TRACK 2.... Ignoring")
+                                wssend("FILTER TRANSITION TO TRACK 1 to TRACK 2.... Ignoring")
                             elif (last_known_position == final_track_1) or (last_known_position == final_track_2):
                                 # THERE WAS NOT FINISH LINE EVENT
                                 wssend("%s - FILTER Finish Line Event Missed" % dateTimeString)
                                 currentLap = inc_lap_count(myCarName)
                                 temp_current_lap = temp_current_lap + 1
-                                wssend("FILTER Increasing Lap count to %s" % currentLap)
+                                wssend("FILTER Increasing Lap count to %s" % temp_current_lap)
 
                                 timeNow = int(time.time()*1000)
                                 if(previousLapTime == 0):
@@ -342,7 +342,7 @@ def dumpPackets():
                             else:
                                 wssend("FILTER FINISH LINE EVENT DETECTED.... ignoring.")
                                 wssend("FILTER current track = %s " % new_known_position)
-                                wssend("FILTER last track = %s " % last_known_position)                                
+                                wssend("FILTER last track = %s " % last_known_position)
 
                         # UPDATE CAR POSITION
                         last_known_position = new_known_position
