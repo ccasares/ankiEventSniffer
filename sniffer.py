@@ -279,7 +279,7 @@ def dumpPackets():
 
                               # Increase current lap
                               currentLap = inc_lap_count(myCarName)
-                              temp_current_lap = temp_current_lap + 1
+                              temp_current_lap += 1
                               wssend("FILTER Finish Line: Increasing Lap count to %s" % temp_current_lap)
 
                               # Send to IoT Cloud
@@ -335,7 +335,7 @@ def dumpPackets():
                                   previousLapTime=timeNow
 
                                   currentLap = inc_lap_count(myCarName)
-                                  temp_current_lap = temp_current_lap + 1
+                                  temp_current_lap += 1
                                   wssend("FILTER Finish Line missed: Increasing Lap count to %s" % temp_current_lap)
 
                                 else:
