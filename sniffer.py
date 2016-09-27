@@ -265,7 +265,6 @@ def dumpPackets():
                         if (trackId == 34):
 
                           wssend("%s - FILTER Finish Line Crossed" % dateTimeString)
-                          wssend("%s - FILTER Finish Line Event: Increasing Current Lap to " % temp_current_lap)
 
                           # SET last_known_position to FINISH LINE to avoid the finish line missed check
                           last_known_position = 0x34
@@ -282,6 +281,7 @@ def dumpPackets():
                               # Increase current lap
                               currentLap = inc_lap_count(myCarName)
                               temp_current_lap = temp_current_lap + 1
+                              wssend("FILTER Finish Line: Increasing Lap count to %s" % temp_current_lap)
 
                               # Send to IoT Cloud
                               jsonData = {"deviceId":piId,"dateTime":timeNow*1000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"lap":currentLap,"lapTime":lapTime}
@@ -337,7 +337,7 @@ def dumpPackets():
 
                                   currentLap = inc_lap_count(myCarName)
                                   temp_current_lap = temp_current_lap + 1
-                                  wssend("FILTER Increasing Lap count to %s" % temp_current_lap)
+                                  wssend("FILTER Finish Line missed: Increasing Lap count to %s" % temp_current_lap)
 
                                 else:
                                   wssend("FILTER Lap too short... ignoring.")
