@@ -326,6 +326,9 @@ def dumpPackets():
 
                                 # ADD CONTROL TO AVOID FAKE LAPS
                                 if(lapTime > 3000):
+
+                                  currentLap = inc_lap_count(myCarName)
+
                                   # Send to IoT Cloud
                                   jsonData = {"deviceId":piId,"dateTime":timeNow*1000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"lap":currentLap,"lapTime":lapTime}
                                   postRest(jsonData, "http://localhost:9999/sendMsgToIoT/urn:oracle:iot:device:data:anki:car:lap")
@@ -333,7 +336,6 @@ def dumpPackets():
                                   trackSegment=0
                                   previousLapTime=timeNow
 
-                                  currentLap = inc_lap_count(myCarName)
                                   temp_current_lap += 1
                                   wssend("FILTER Finish Line missed: Increasing Lap count to %s" % temp_current_lap)
 
