@@ -21,6 +21,7 @@ from SnifferAPI.Devices import Device
 from SnifferAPI.Devices import DeviceList
 
 # Variable to control lap
+currentLap = 0
 
 final_track_1 = 0x0e
 final_track_2 = 0x0d
@@ -193,6 +194,7 @@ def selectDevice(devlist):
 
 
 def dumpPackets():
+    global currentLap
     global trackSegment
     global totalTrackSegment
     global previousLapTime
