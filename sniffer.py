@@ -27,6 +27,15 @@ global raceCount
 global nodejs
 
 # Variable to control lap
+
+global final_track_1
+global final_track_2
+global first_track_1
+global first_track_2
+global last_known_position
+global new_known_position
+global temp_current_lap
+
 final_track_1 = 0x0e
 final_track_2 = 0x0d
 first_track_1 = 0x00
@@ -207,14 +216,6 @@ def dumpPackets():
     """Dumps incoming packets to the display"""
 
     wssend("FUERA DEL BUCLEEEEEE")
-
-    global final_track_1
-    global final_track_2
-    global first_track_1
-    global first_track_2
-    global last_known_position
-    global new_known_position
-    global temp_current_lap
 
     # Get (pop) unprocessed BLE packets.
     packets =mySniffer.getPackets()
