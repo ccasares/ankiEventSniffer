@@ -26,6 +26,18 @@ global raceStatus
 global raceCount
 global nodejs
 
+# Variable to control lap
+final_track_1 = 0x0e
+final_track_2 = 0x0d
+first_track_1 = 0x00
+first_track_2 = 0x01
+
+last_known_position = 0x00
+new_known_position = 0x00
+
+temp_current_lap = 0
+
+
 
 race_status_file = "/home/pi/race_status.dat"
 race_count_file="/home/pi/race_count.dat"
@@ -35,6 +47,8 @@ nodejs = "http://localhost:9999"
 
 mySniffer = None
 """@type: SnifferAPI.Sniffer.Sniffer"""
+
+
 
 def get_race_status():
   try:
@@ -193,6 +207,14 @@ def dumpPackets():
     """Dumps incoming packets to the display"""
 
     wssend("FUERA DEL BUCLEEEEEE")
+
+    global final_track_1
+    global final_track_2
+    global first_track_1
+    global first_track_2
+    global last_known_position
+    global new_known_position
+    global temp_current_lap
 
     # Get (pop) unprocessed BLE packets.
     packets =mySniffer.getPackets()
@@ -425,26 +447,6 @@ if __name__ == '__main__':
                            action="store_true",
                            default=False,
                            help="verbose mode (all serial traffic is displayed)")
-
-    # Variable to control lap
-    global final_track_1
-    global final_track_2
-    global first_track_1
-    global first_track_2
-    global last_known_position
-    global new_known_position
-    global temp_current_lap
-
-    final_track_1 = 0x0e
-    final_track_2 = 0x0d
-    first_track_1 = 0x00
-    first_track_2 = 0x01
-
-    last_known_position = 0x00
-    new_known_position = 0x00
-
-    temp_current_lap = 0
-
 
     # Parser the arguments passed in from the command-line
     args = argparser.parse_args()
