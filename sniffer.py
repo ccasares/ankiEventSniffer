@@ -203,10 +203,10 @@ def dumpPackets():
     first_track_1 = 0x00
     first_track_2 = 0x01
 
-    last_known_position = 0x00
-    new_known_position = 0x00
+    global last_known_position = 0x00
+    global new_known_position = 0x00
 
-    temp_current_lap = 0
+    global temp_current_lap = 0
 
     """Dumps incoming packets to the display"""
     # Get (pop) unprocessed BLE packets.
@@ -215,8 +215,6 @@ def dumpPackets():
     # Display the packets on the screen in verbose mode
     if args.verbose:
         for packet in packets:
-	    #CPICAZO TRACE
-	    #print packet.blePacket.payload
             if packet.blePacket is not None:
                 # Display the raw BLE packet payload
                 # Note: 'BlePacket' is nested inside the higher level 'Packet' wrapper class
