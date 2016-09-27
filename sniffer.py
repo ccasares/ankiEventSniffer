@@ -259,14 +259,17 @@ def dumpPackets():
 
                         #print "Track ID: %d" % trackId
                         #sys.stdout.flush()
-                        if (trackId == 34): # Finish Segment
-                          # Increase current lap
-                          currentLap = inc_lap_count(myCarName)
-                          temp_current_lap = temp_current_lap + 1
-                          print "%s - Finish Line Crossed" % dateTimeString;
-                          wssend("%s - Finish Line Crossed" % dateTimeString)
-                          wssend("%s - FILTER Current Lap" % temp_current_lap)
-                          sys.stdout.flush()
+
+                        # FINISH LINE EVENT
+
+                        if (trackId == 34):
+
+                          wssend("%s - FILTER Finish Line Crossed" % dateTimeString)
+                          wssend("%s - FILTER Finish Line Event: Increasing Current Lap to " % temp_current_lap)
+
+                          # SET last_known_position to FINISH LINE to avoid the finish line missed check
+                          last_known_position = 0x34
+                          wssend("FILTER Setting last_known_position to = %s " % last_known_position)
 
                           timeNow = int(time.time()*1000)
                           if(previousLapTime == 0):
@@ -275,27 +278,24 @@ def dumpPackets():
                             lapTime = timeNow - previousLapTime
 
                             if(lapTime > 3000):
+
+                              # Increase current lap
+                              currentLap = inc_lap_count(myCarName)
+                              temp_current_lap = temp_current_lap + 1
+
                               # Send to IoT Cloud
                               jsonData = {"deviceId":piId,"dateTime":timeNow*1000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"lap":currentLap,"lapTime":lapTime}
                               #postRest(jsonData, "http://localhost:9999/sendMsgToIoT/urn:oracle:iot:device:data:anki:car:lap")
 
-                              print "%s: LapTime: %d" % (myCarName, lapTime)
-                              wssend("%s: LapTime: %d" % (myCarName, lapTime))
-                              sys.stdout.flush()
+                              wssend("%s: FILTER LapTime: %d" % (myCarName, lapTime))
                               trackSegment=0
-                              # SET last_known_position to FINISH LINE
-                              last_known_position = 0x34
-
-                              print "Reset previous lap time."
-                              wssend("Reset previous lap time.")
+                              wssend("FILTER Reset previous lap time.")
                               previousLapTime=timeNow
                             else:
                               #print "%s: Tracksegment: %d" % (myCarName, trackSegment)
                               #print "%s: LapTime: %d" % (myCarName, lapTime)
-                              print "Lap too short... ignoring."
-                              wssend("Lap too short... ignoring.")
+                              wssend("FILTER Lap too short... ignoring.")
                               #trackSegment=0
-                              sys.stdout.flush()
 
 
                             #print "Reset previous lap time."
@@ -303,14 +303,14 @@ def dumpPackets():
 
                     elif msgId == 0x29:
                       if len(packet.blePacket.payload) > 25:
-                        print "%s - TRANSITION UPDATE: " % dateTimeString
-                        wssend("%s - TRANSITION UPDATE: " % dateTimeString)
+                        # print "%s - TRANSITION UPDATE: " % dateTimeString
+                        # wssend("%s - TRANSITION UPDATE: " % dateTimeString)
 
                         # VICTOR
                         # Get the new position
                         new_known_position = packet.blePacket.payload[9]
                         wssend("FILTER TRANSITION UPDATE TO POSITION: %s" % new_known_position)
-                        wssend("COMMING FROM POSITION: %s" % last_known_position)
+                        wssend("FILTER COMMING FROM POSITION: %s" % last_known_position)
                         # Check if we are in the two first tracks.
                         if (new_known_position == first_track_1) or (new_known_position == first_track_2):
                             # CHECK IF WE LOSE THE FINISH LINE Event
@@ -319,9 +319,6 @@ def dumpPackets():
                             elif (last_known_position == final_track_1) or (last_known_position == final_track_2):
                                 # THERE WAS NOT FINISH LINE EVENT
                                 wssend("%s - FILTER Finish Line Event Missed" % dateTimeString)
-                                currentLap = inc_lap_count(myCarName)
-                                temp_current_lap = temp_current_lap + 1
-                                wssend("FILTER Increasing Lap count to %s" % temp_current_lap)
 
                                 timeNow = int(time.time()*1000)
                                 if(previousLapTime == 0):
@@ -338,6 +335,10 @@ def dumpPackets():
                                   trackSegment=0
                                   previousLapTime=timeNow
 
+                                  currentLap = inc_lap_count(myCarName)
+                                  temp_current_lap = temp_current_lap + 1
+                                  wssend("FILTER Increasing Lap count to %s" % temp_current_lap)
+
                                 else:
                                   wssend("FILTER Lap too short... ignoring.")
                             else:
@@ -347,6 +348,7 @@ def dumpPackets():
 
                         # UPDATE CAR POSITION
                         last_known_position = new_known_position
+                        wssend("FILTER Setting last_known_position to = %s " % last_known_position)
 
                         #print " ".join(['0x%02x' % b for b in packetlist])
                         leftWheelDistance = packet.blePacket.payload[24]
