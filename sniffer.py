@@ -385,8 +385,8 @@ def dumpPackets():
                     elif msgId == 0x2b: # ANKI_VEHICLE_MSG_V2C_VEHICLE_DELOCALIZED
                       #print "%s - Vehicle Delocalised" % dateTimeString
                       wssend("%s - Vehicle Delocalised" % dateTimeString)
-                      sys.stdout.flush()
-                      print " ".join(['0x%02x' % b for b in packetlist])
+                      #sys.stdout.flush()
+                      #print " ".join(['0x%02x' % b for b in packetlist])
                       # Send to IoT
                       jsonData = {"deviceId":piId,"dateTime":int(time.time())*1000000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"lap":currentLap,"message":"Off Track"}
                       postRest(jsonData, "http://localhost:9999/sendAlertToIoT/urn:oracle:iot:device:event:anki:car:offtrack/SIGNIFICANT/Off Track Event")
