@@ -125,12 +125,12 @@ def get_current_lap(car):
   try:
     with open(filename, 'r') as f:
       first_line = f.readline()
-      return(first_line)
+      return(int(first_line))
   except (IOError):
       print "%s file not found. Creating..." % filename
       with open(filename,"w+") as f:
         f.write("0")
-      return "0"
+      return 0
 
 def set_lap(car, lap):
   filename = "/home/pi/race_lap_%s.dat" % car
@@ -148,7 +148,8 @@ def inc_lap_count(car):
     l=int(get_current_lap(car))
     l=l+1
     set_lap(car, l)
-    return "%d" % l
+#    return "%d" % l
+    return l
 
 def selectDevice(devlist):
     """
