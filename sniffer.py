@@ -70,10 +70,10 @@ def postRest(message, url):
     data_json = json.dumps(message)
     #print "posting %s" % data_json
     headers = {'Content-type': 'application/json'}
-    print "[REST] %s  - %s - %s" % (myCarName,url, data_json)
+#    print "[REST] %s  - %s - %s" % (myCarName,url, data_json)
     response = requests.post(url, data=data_json, headers=headers)
-    print "%s" % response
-    sys.stdout.flush()
+#    print "%s" % response
+#    sys.stdout.flush()
 
 def setup(serport, delay=6):
     """
