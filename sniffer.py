@@ -37,7 +37,11 @@ race_status_file = "/home/pi/race_status.dat"
 race_count_file="/home/pi/race_count.dat"
 raceStatus = "UNKNOWN"
 raceCount = 0
-nodejs = "http://localhost:9999"
+nodejs = "http://localhost:8888"
+LAPURI = "/iot/send/data/urn:oracle:iot:device:data:anki:car:lap"
+SPEEDURI = "/iot/send/data/urn:oracle:iot:device:data:anki:car:speed"
+TRANSITIONURI = "/iot/send/data/urn:oracle:iot:device:data:anki:car:transition"
+OFFTRACKURI = "/iot/send/alert/urn:oracle:iot:device:event:anki:car:offtrack"
 
 mySniffer = None
 """@type: SnifferAPI.Sniffer.Sniffer"""
@@ -67,9 +71,9 @@ def postRest(message, url):
     #print "posting %s" % data_json
     headers = {'Content-type': 'application/json'}
     print "[REST] %s  - %s - %s" % (myCarName,url, data_json)
+    response = requests.post(url, data=data_json, headers=headers)
+    print "%s" % response
     sys.stdout.flush()
-    #response = requests.post(url, data=data_json, headers=headers)
-
 
 def setup(serport, delay=6):
     """
@@ -209,6 +213,12 @@ def dumpPackets():
     global new_known_position
     global temp_current_lap
 
+    global nodejs
+    global LAPURI
+    global SPEEDURI
+    global TRANSITIONURI
+    global OFFTRACKURI
+
     """Dumps incoming packets to the display"""
 
     wssend("FUERA DEL BUCLEEEEEE")
@@ -256,8 +266,8 @@ def dumpPackets():
                         dateTimeString=datetime.datetime.now().strftime("%y/%m/%d %H:%M:%S")
 
                         # Send to IoT Cloud
-                        jsonData = {"deviceId":piId,"dateTime":int(time.time())*1000000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"speed":speed,"trackId":trackId,"lap":currentLap}
-                        postRest(jsonData, "http://localhost:9999/sendMsgToIot/urn:oracle:iot:device:data:anki:car:speed")
+                        jsonData = {"deviceId":piId,"dateTime":int(time.time()),"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carId":myDeviceAddress,"carName":myCarName,"speed":speed,"trackId":trackId,"lap":currentLap}
+                        postRest(jsonData, "%s%s" % (nodejs,SPEEDURI) )
 
                         #print "Track ID: %d" % trackId
                         #sys.stdout.flush()
@@ -286,8 +296,8 @@ def dumpPackets():
                               wssend("FILTER Finish Line: Increasing Lap count to %s" % temp_current_lap)
 
                               # Send to IoT Cloud
-                              jsonData = {"deviceId":piId,"dateTime":timeNow*1000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"lap":currentLap,"lapTime":lapTime}
-                              postRest(jsonData, "http://localhost:9999/sendMsgToIoT/urn:oracle:iot:device:data:anki:car:lap")
+                              jsonData = {"deviceId":piId,"dateTime":int(time.time()),"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carId":myDeviceAddress,"carName":myCarName,"lap":currentLap,"lapTime":lapTime}
+                              postRest(jsonData, "%s%s" % (nodejs,LAPURI) )
 
                               wssend("%s: FILTER LapTime: %d" % (myCarName, lapTime))
                               trackSegment=0
@@ -334,8 +344,8 @@ def dumpPackets():
                                   currentLap = inc_lap_count(myCarName)
 
                                   # Send to IoT Cloud
-                                  jsonData = {"deviceId":piId,"dateTime":timeNow*1000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"lap":currentLap,"lapTime":lapTime}
-                                  postRest(jsonData, "http://localhost:9999/sendMsgToIoT/urn:oracle:iot:device:data:anki:car:lap")
+                                  jsonData = {"deviceId":piId,"dateTime":int(time.time()),"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carId":myDeviceAddress,"carName":myCarName,"lap":currentLap,"lapTime":lapTime}
+                                  postRest(jsonData, "%s%s" % (nodejs,LAPURI) )
                                   wssend("%s: FILTER LapTime: %d" % (myCarName, lapTime))
                                   trackSegment=0
                                   previousLapTime=timeNow
@@ -381,8 +391,8 @@ def dumpPackets():
                         #print "%s - Sending Transition %s: Left/Right 0x%02x: 0x%02x - %s - [%d]" % (dateTimeString, myCarName, leftWheelDistance, rightWheelDistance,trackStyle,trackSegment)
                         wssend("%s - Sending Transition %s: Left/Right 0x%02x: 0x%02x - %s - [%d]" % (dateTimeString, myCarName, leftWheelDistance, rightWheelDistance,trackStyle,trackSegment))
                         # Send to IoT
-                        jsonData = {"deviceId":piId,"dateTime":timeNow*1000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"trackStyle":trackStyle,"trackSegment":trackSegment,"lap":currentLap}
-                        postRest(jsonData, "http://localhost:9999/sendMsgToIoT/urn:oracle:iot:device:data:anki:car:transition")
+                        jsonData = {"deviceId":piId,"dateTime":int(time.time()),"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carId":myDeviceAddress,"carName":myCarName,"trackStyle":trackStyle,"trackSegment":trackSegment,"lap":currentLap}
+                        postRest(jsonData, "%s%s" % (nodejs,TRANSITIONURI) )
 
                     elif msgId == 0x2b: # ANKI_VEHICLE_MSG_V2C_VEHICLE_DELOCALIZED
                       #print "%s - Vehicle Delocalised" % dateTimeString
@@ -390,8 +400,8 @@ def dumpPackets():
                       #sys.stdout.flush()
                       #print " ".join(['0x%02x' % b for b in packetlist])
                       # Send to IoT
-                      jsonData = {"deviceId":piId,"dateTime":int(time.time())*1000000000,"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carID":myDeviceAddress,"carName":myCarName,"lap":currentLap,"message":"Off Track", "lastKnownTrack":last_known_position}
-                      postRest(jsonData, "http://localhost:9999/sendAlertToIoT/urn:oracle:iot:device:event:anki:car:offtrack/SIGNIFICANT/Off Track Event")
+                      jsonData = {"deviceId":piId,"dateTime":int(time.time()),"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carId":myDeviceAddress,"carName":myCarName,"lap":currentLap,"message":"Off Track", "lastKnownTrack":last_known_position}
+                      postRest(jsonData, "%s%s" % (nodejs,OFFTRACKURI) )
                     elif msgId == 0x1b: # ANKI_VEHICLE_MSG_V2C_BATTERY_LEVEL_RESPONSE
                       print " ".join(['0x%02x' % b for b in packetlist])
     else:
