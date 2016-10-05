@@ -396,7 +396,8 @@ def dumpPackets():
 
                     elif msgId == 0x2b: # ANKI_VEHICLE_MSG_V2C_VEHICLE_DELOCALIZED
                       #print "%s - Vehicle Delocalised" % dateTimeString
-                      wssend("%s - Vehicle Delocalised" % dateTimeString)
+                      wssend("%s - FILTER Vehicle Delocalised" % dateTimeString)
+                      wssend("FILTER Vehicle Delocalised: Last Known Possition = %s" % last_known_position)
                       #sys.stdout.flush()
                       #print " ".join(['0x%02x' % b for b in packetlist])
                       # Send to IoT
