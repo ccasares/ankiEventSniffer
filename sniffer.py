@@ -30,6 +30,7 @@ first_track_2 = 0x01
 
 last_known_position = 0x00
 new_known_position = 0x00
+tentative_offtrack_position = 0x00
 
 temp_current_lap = 0
 
@@ -212,6 +213,7 @@ def dumpPackets():
     global last_known_position
     global new_known_position
     global temp_current_lap
+    global tentative_offtrack_position
 
     global nodejs
     global LAPURI
@@ -398,10 +400,13 @@ def dumpPackets():
                       #print "%s - Vehicle Delocalised" % dateTimeString
                       wssend("%s - FILTER Vehicle Delocalised" % dateTimeString)
                       wssend("FILTER Vehicle Delocalised: Last Known Possition = %s" % last_known_position)
-                      #sys.stdout.flush()
-                      #print " ".join(['0x%02x' % b for b in packetlist])
-                      # Send to IoT
-                      jsonData = {"deviceId":piId,"dateTime":int(time.time()),"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carId":myDeviceAddress,"carName":myCarName,"lap":currentLap,"message":"Off Track", "lastKnownTrack":last_known_position}
+
+                      # Calculate Wehicle Delocalised position
+                      # Based in our test it should be last_known_position - 3 aprox.
+                      tentative_offtrack_position = last_known_position - 3
+                      wssend("FILTER Vehicle Delocalised: Sending drone to position = %s" % tentative_offtrack_position)
+
+                      jsonData = {"deviceId":piId,"dateTime":int(time.time()),"dateTimeString":dateTimeString,"raceStatus": raceStatus,"raceId":raceCount,"carId":myDeviceAddress,"carName":myCarName,"lap":currentLap,"message":"Off Track", "lastKnownTrack":tentative_offtrack_position}
                       postRest(jsonData, "%s%s" % (nodejs,OFFTRACKURI) )
                     elif msgId == 0x1b: # ANKI_VEHICLE_MSG_V2C_BATTERY_LEVEL_RESPONSE
                       print " ".join(['0x%02x' % b for b in packetlist])
