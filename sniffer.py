@@ -60,10 +60,10 @@ def get_race_count():
   try:
     with open(race_count_file, 'r') as f:
       first_line = f.readline()
-      return(first_line)
+      return(int(first_line))
   except (IOError):
       print "%s file not found!!!" % race_count_file
-      return "0"
+      return 0
 
 def postRest(message, url):
     #print "posting %s" % message
