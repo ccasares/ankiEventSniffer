@@ -34,8 +34,9 @@ tentative_offtrack_position = 0x00
 
 temp_current_lap = 0
 
-race_status_file = "/home/pi/race_status.dat"
-race_count_file="/home/pi/race_count.dat"
+race_status_file = "/home/pi/setup/race_status.dat"
+race_count_file="/home/pi/setup/race_count.dat"
+race_lap_file="/home/pi/setup/race_lap_%s.dat"
 raceStatus = "UNKNOWN"
 raceCount = 0
 nodejs = "http://localhost:8888"
@@ -126,7 +127,8 @@ def scanForDevices(scantime=3):
     return devs
 
 def get_current_lap(car):
-  filename = "/home/pi/race_lap_%s.dat" % car
+  global race_lap_file
+  filename = race_lap_file % car
   try:
     with open(filename, 'r') as f:
       first_line = f.readline()
@@ -138,7 +140,8 @@ def get_current_lap(car):
       return 0
 
 def set_lap(car, lap):
-  filename = "/home/pi/race_lap_%s.dat" % car
+  global race_lap_file
+  filename = race_lap_file % car
   try:
     with open(filename, 'r+') as f:
       f.seek(0)
